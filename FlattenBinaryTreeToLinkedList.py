@@ -3,60 +3,39 @@ class TreeNode:
         self.val = val
         self.left = left
         self.right = right
+        
+def buildTree(nodes, index):
+    if index < len(nodes):
+        if nodes[index] == 'N':
+            return None
+        root = TreeNode(nodes[index])
+        root.left = buildTree(nodes, 2*index+1)
+        root.right = buildTree(nodes, 2*index+2)
+        return root
+    
+    return None
 
-def flatten_binary_tree_to_linked_list(root):
+def flatten(root):
     if not root:
-        return None
+        return
+    flatten(root.left)
+    flatten(root.right)
     
-    # Stack to store nodes during inorder traversal
-    stack = []
-    current = root
+    right_subtree = root.right
+    root.right = root.left
+    root.left = None
     
-    while stack or current:
-        if current:
-            stack.append(current)
-            current = current.left
-        else:
-            current = stack.pop()
-            if current.right:
-                temp = current.right
-                current.right = current.left
-                current.left = None
-                while current.right:
-                    current = current.right
-                current.right = temp
-            current = current.right
-
-    # Printing the linked list in preorder sequence
-    current = root
-    while current:
-        print(current.val, end=' ')
-        current = current.right
+    while root.right:
+        root = root.right
+    root.right = right_subtree
+        
+def print_linked_list(root):
+    while root:
+        print(root.val, end='')
+        root = root.right
     print()
-
-# Function to build the tree from the input string
-def build_tree(s):
-    stack = []
-    root = TreeNode(int(s[0]))
-    stack.append(root)
-    i = 1
-    while stack and i < len(s):
-        node = stack.pop()
-        if s[i] != 'N':
-            node.left = TreeNode(int(s[i]))
-            stack.append(node.left)
-        i += 1
-        if i < len(s) and s[i] != 'N':
-            node.right = TreeNode(int(s[i]))
-            stack.append(node.right)
-        i += 1
-    return root
-
-# Taking input from the user
-input_str = "12534N6NNNNNNN7"  # Input string
-
-# Build the binary tree from the input string
-root = build_tree(input_str)
-
-# Flatten the binary tree to linked list and print the result
-flatten_binary_tree_to_linked_list(root)
+        
+nodes_input = input()
+root = buildTree(nodes_input, 0)
+flatten(root)
+print_linked_list(root)
